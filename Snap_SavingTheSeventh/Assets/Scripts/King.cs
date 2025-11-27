@@ -15,23 +15,73 @@ public class King : MonoBehaviour
     public Vector2 respawnPoint;
     public float fallLimitY = -10f;
 
+    [Header("Map Boundary")]
+    public float minX;
+    public float maxX;
+
     private Rigidbody2D rb;
     private Animator anim;
     private bool isFacingRight = true;
+    private bool isGrounded;
+
+    // Cek apakah Animator punya parameter "Grounded"
+    private bool hasGroundedParam = false;
+
+    void Awake()
+    {
+        // ambil komponen di Awake
+        rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+    }
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();      // <—— tambahkan animator
-        respawnPoint = transform.position; 
+        respawnPoint = transform.position;
+
+        // VALIDASI DEPENDENCY — jika ada yang null, beri pesan jelas dan matikan skrip
+        if (rb == null)
+        {
+            Debug.LogError("[King] Rigidbody2D tidak ditemukan di GameObject ini. Tambahkan Rigidbody2D dan pastikan 'Body Type' = Dynamic.");
+            enabled = false;
+            return;
+        }
+
+        if (groundCheck == null)
+        {
+            Debug.LogError("[King] groundCheck belum di-assign di Inspector. Buat child empty object sebagai groundCheck dan drag ke field ini.");
+            enabled = false;
+            return;
+        }
+
+        if (anim == null)
+        {
+            Debug.LogWarning("[King] Animator tidak ditemukan — animasi akan dinonaktifkan. Jika ingin animasi, tambahkan Animator dan AnimatorController.");
+            // tidak `return` — kita masih bisa jalan tanpa anim
+        }
+
+        // Cek apakah Animator punya parameter "Grounded" jika anim ada
+        if (anim != null)
+        {
+            foreach (var p in anim.parameters)
+            {
+                if (p.name == "Grounded" && p.type == AnimatorControllerParameterType.Bool)
+                {
+                    hasGroundedParam = true;
+                    break;
+                }
+            }
+        }
     }
 
     void Update()
     {
+        // kalau skrip dinonaktifkan di Start() karena error, Update gak akan dipanggil
         Move();
+        CheckGround();
         Jump();
         CheckFall();
-        UpdateAnimations();                   // <—— update animasi setiap frame
+        ClampPosition();
+        UpdateAnimations();
     }
 
     void Move()
@@ -39,20 +89,23 @@ public class King : MonoBehaviour
         float move = Input.GetAxisRaw("Horizontal");
         rb.linearVelocity = new Vector2(move * moveSpeed, rb.linearVelocity.y);
 
-        // Flip kiri/kanan
-        if (move > 0 && !isFacingRight)
-            Flip();
-        else if (move < 0 && isFacingRight)
-            Flip();
+        if (move > 0 && !isFacingRight) Flip();
+        else if (move < 0 && isFacingRight) Flip();
+    }
+
+    void CheckGround()
+    {
+        // safety: pastikan groundCheck tidak null (seharusnya sudah divalidasi di Start)
+        if (groundCheck == null) return;
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
 
     void Jump()
     {
-        bool grounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-
-        if (grounded && Input.GetKeyDown(KeyCode.Space))
+        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            isGrounded = false;
         }
     }
 
@@ -73,15 +126,23 @@ public class King : MonoBehaviour
         transform.localScale = s;
     }
 
-
-    //  ANIMATION
-    void UpdateAnimations()
+    void ClampPosition()
     {
-        // Parameter "Speed" = nilai absolute kecepatan horizontal
-        anim.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+        Vector3 pos = transform.position;
+        pos.x = Mathf.Clamp(pos.x, minX, maxX);
+        transform.position = pos;
     }
 
-    // Visual debug untuk ground check
+    void UpdateAnimations()
+    {
+        if (anim == null) return;
+
+        anim.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+
+        if (hasGroundedParam)
+            anim.SetBool("Grounded", isGrounded);
+    }
+
     void OnDrawGizmosSelected()
     {
         if (groundCheck != null)
