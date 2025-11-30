@@ -20,18 +20,19 @@ public class King : MonoBehaviour
     public float maxX;
 
     private Rigidbody2D rb;
-    private Animator anim;
+    public Animator anim;
     private bool isFacingRight = true;
     private bool isGrounded;
 
     // Cek apakah Animator punya parameter "Grounded"
     private bool hasGroundedParam = false;
+    private float moveInput;
 
     void Awake()
     {
         // ambil komponen di Awake
         rb = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
+        // anim = GetComponent<Animator>();
     }
 
     void Start()
@@ -53,11 +54,11 @@ public class King : MonoBehaviour
             return;
         }
 
-        if (anim == null)
-        {
-            Debug.LogWarning("[King] Animator tidak ditemukan — animasi akan dinonaktifkan. Jika ingin animasi, tambahkan Animator dan AnimatorController.");
-            // tidak `return` — kita masih bisa jalan tanpa anim
-        }
+        // if (anim == null)
+        // {
+        //     Debug.LogWarning("[King] Animator tidak ditemukan — animasi akan dinonaktifkan. Jika ingin animasi, tambahkan Animator dan AnimatorController.");
+        //     // tidak `return` — kita masih bisa jalan tanpa anim
+        // }
 
         // Cek apakah Animator punya parameter "Grounded" jika anim ada
         if (anim != null)
@@ -70,6 +71,25 @@ public class King : MonoBehaviour
                     break;
                 }
             }
+        }
+
+        if (anim == null)
+        {
+            Debug.LogError("GAWAT: Animator masih kosong! Kamu belum drag UnitRoot ke slot Anim di Script King.");
+        }
+        else
+        {
+            Debug.Log("AMAN: Animator sudah terhubung ke: " + anim.gameObject.name);
+            
+            // Cek apakah parameter 1_Move ada
+            bool paramFound = false;
+            foreach(var param in anim.parameters)
+            {
+                if(param.name == "1_Move") paramFound = true;
+            }
+
+            if(paramFound) Debug.Log("AMAN: Parameter 1_Move DITEMUKAN.");
+            else Debug.LogError("GAWAT: Parameter 1_Move TIDAK DITEMUKAN di Animator ini!");
         }
     }
 
@@ -86,11 +106,11 @@ public class King : MonoBehaviour
 
     void Move()
     {
-        float move = Input.GetAxisRaw("Horizontal");
-        rb.linearVelocity = new Vector2(move * moveSpeed, rb.linearVelocity.y);
+        moveInput = Input.GetAxisRaw("Horizontal");
+        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
-        if (move > 0 && !isFacingRight) Flip();
-        else if (move < 0 && isFacingRight) Flip();
+        if (moveInput > 0 && !isFacingRight) Flip();
+        else if (moveInput < 0 && isFacingRight) Flip();
     }
 
     void CheckGround()
@@ -137,7 +157,13 @@ public class King : MonoBehaviour
     {
         if (anim == null) return;
 
-        anim.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+        // anim.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
+
+        bool isWalking = moveInput != 0;
+        anim.SetBool("1_Move", isWalking);
+
+        bool isJumping = rb.linearVelocity.y > 0.1f && !isGrounded;
+        anim.SetBool("7_Jump", isJumping);
 
         if (hasGroundedParam)
             anim.SetBool("Grounded", isGrounded);
