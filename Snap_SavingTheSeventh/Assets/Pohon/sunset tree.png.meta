@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 19cd3bdef7685444e9ec1f1c418f77aa
+guid: 83b818559f438d74091839e0a957cb51
 TextureImporter:
   internalIDToNameTable:
   - first:
@@ -103,10 +103,10 @@ TextureImporter:
       name: sunset tree_0
       rect:
         serializedVersion: 2
-        x: 693
-        y: 520
-        width: 2782
-        height: 3128
+        x: 39
+        y: 50
+        width: 547
+        height: 526
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}

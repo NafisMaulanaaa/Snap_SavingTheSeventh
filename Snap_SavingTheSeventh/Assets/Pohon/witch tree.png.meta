@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a01e1413ad450734a8298e4e115ec934
+guid: 6387f3fd55633ff49b4e65a19c0834dc
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1831404557549146588
-    second: normal tree_0
+      213: -3734195054246466611
+    second: witch tree_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: normal tree_0
+      name: witch tree_0
       rect:
         serializedVersion: 2
-        x: 693
-        y: 520
-        width: 2782
-        height: 3128
+        x: 39
+        y: 50
+        width: 547
+        height: 526
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 42e6043124b8596e0800000000000000
-      internalID: -1831404557549146588
+      spriteID: dcb6e9df1697d2cc0800000000000000
+      internalID: -3734195054246466611
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      normal tree_0: -1831404557549146588
+      witch tree_0: -3734195054246466611
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
