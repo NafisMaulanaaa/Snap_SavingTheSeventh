@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: eefb29c8caae4d04f9325aabad483f08
+guid: 19cd3bdef7685444e9ec1f1c418f77aa
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1308390186321918944
-    second: Normal tree_0
+      213: -6050002144104821702
+    second: sunset tree_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Normal tree_0
+      name: sunset tree_0
       rect:
         serializedVersion: 2
-        x: 64
-        y: 29
-        width: 952
-        height: 1022
+        x: 693
+        y: 520
+        width: 2782
+        height: 3128
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 024cca4ce0aa7dde0800000000000000
-      internalID: -1308390186321918944
+      spriteID: a3cc74eaa131a0ca0800000000000000
+      internalID: -6050002144104821702
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Normal tree_0: -1308390186321918944
+      sunset tree_0: -6050002144104821702
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
