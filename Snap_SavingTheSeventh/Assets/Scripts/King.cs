@@ -19,48 +19,40 @@ public class King : MonoBehaviour
     public float minX;
     public float maxX;
 
+    [Header("Vertical Boundary")]
+    public float maxY;
+
     private Rigidbody2D rb;
     public Animator anim;
     private bool isFacingRight = true;
     private bool isGrounded;
 
-    // Cek apakah Animator punya parameter "Grounded"
     private bool hasGroundedParam = false;
     private float moveInput;
 
     void Awake()
     {
-        // ambil komponen di Awake
         rb = GetComponent<Rigidbody2D>();
-        // anim = GetComponent<Animator>();
     }
 
     void Start()
     {
         respawnPoint = transform.position;
 
-        // VALIDASI DEPENDENCY — jika ada yang null, beri pesan jelas dan matikan skrip
         if (rb == null)
         {
-            Debug.LogError("[King] Rigidbody2D tidak ditemukan di GameObject ini. Tambahkan Rigidbody2D dan pastikan 'Body Type' = Dynamic.");
+            Debug.LogError("[King] Rigidbody2D tidak ditemukan.");
             enabled = false;
             return;
         }
 
         if (groundCheck == null)
         {
-            Debug.LogError("[King] groundCheck belum di-assign di Inspector. Buat child empty object sebagai groundCheck dan drag ke field ini.");
+            Debug.LogError("[King] groundCheck belum di-assign.");
             enabled = false;
             return;
         }
 
-        // if (anim == null)
-        // {
-        //     Debug.LogWarning("[King] Animator tidak ditemukan — animasi akan dinonaktifkan. Jika ingin animasi, tambahkan Animator dan AnimatorController.");
-        //     // tidak `return` — kita masih bisa jalan tanpa anim
-        // }
-
-        // Cek apakah Animator punya parameter "Grounded" jika anim ada
         if (anim != null)
         {
             foreach (var p in anim.parameters)
@@ -75,27 +67,25 @@ public class King : MonoBehaviour
 
         if (anim == null)
         {
-            Debug.LogError("GAWAT: Animator masih kosong! Kamu belum drag UnitRoot ke slot Anim di Script King.");
+            Debug.LogError("GAWAT: Animator masih kosong!");
         }
         else
         {
-            Debug.Log("AMAN: Animator sudah terhubung ke: " + anim.gameObject.name);
-            
-            // Cek apakah parameter 1_Move ada
+            Debug.Log("AMAN: Animator terhubung ke: " + anim.gameObject.name);
+
             bool paramFound = false;
-            foreach(var param in anim.parameters)
+            foreach (var param in anim.parameters)
             {
-                if(param.name == "1_Move") paramFound = true;
+                if (param.name == "1_Move") paramFound = true;
             }
 
-            if(paramFound) Debug.Log("AMAN: Parameter 1_Move DITEMUKAN.");
-            else Debug.LogError("GAWAT: Parameter 1_Move TIDAK DITEMUKAN di Animator ini!");
+            if (paramFound) Debug.Log("AMAN: Parameter 1_Move ditemukan.");
+            else Debug.LogError("GAWAT: Parameter 1_Move tidak ditemukan!");
         }
     }
 
     void Update()
     {
-        // kalau skrip dinonaktifkan di Start() karena error, Update gak akan dipanggil
         Move();
         CheckGround();
         Jump();
@@ -115,14 +105,16 @@ public class King : MonoBehaviour
 
     void CheckGround()
     {
-        // safety: pastikan groundCheck tidak null (seharusnya sudah divalidasi di Start)
         if (groundCheck == null) return;
         isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
     }
 
     void Jump()
     {
-        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
+        // —— PERBAIKAN DISINI ——
+        if (!isGrounded) return;
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             isGrounded = false;
@@ -149,15 +141,18 @@ public class King : MonoBehaviour
     void ClampPosition()
     {
         Vector3 pos = transform.position;
+
         pos.x = Mathf.Clamp(pos.x, minX, maxX);
+
+        if (pos.y > maxY)
+            pos.y = maxY;
+
         transform.position = pos;
     }
 
     void UpdateAnimations()
     {
         if (anim == null) return;
-
-        // anim.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
 
         bool isWalking = moveInput != 0;
         anim.SetBool("1_Move", isWalking);
