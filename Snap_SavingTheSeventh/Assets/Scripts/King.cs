@@ -30,6 +30,10 @@ public class King : MonoBehaviour
     private bool hasGroundedParam = false;
     private float moveInput;
 
+    [Header("Attack")]
+    public float attackDuration = 0.4f; 
+    private bool isAttacking = false;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -91,11 +95,14 @@ public class King : MonoBehaviour
         Jump();
         CheckFall();
         ClampPosition();
+        Attack();
         UpdateAnimations();
     }
 
     void Move()
     {
+        if (isAttacking) return;
+
         moveInput = Input.GetAxisRaw("Horizontal");
         rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
 
@@ -111,14 +118,45 @@ public class King : MonoBehaviour
 
     void Jump()
     {
-        // —— PERBAIKAN DISINI ——
-        if (!isGrounded) return;
+        if (!isGrounded || isAttacking) return;
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
             isGrounded = false;
         }
+    }
+
+    void Attack()
+    {
+        if (isAttacking) return;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            isAttacking = true;
+
+            // Stop movement
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+
+            if (anim != null)
+            {
+                anim.SetBool("2_Attack", true);
+            }
+
+            StartCoroutine(ResetAttack());
+        }
+    }
+
+    System.Collections.IEnumerator ResetAttack()
+    {
+        yield return new WaitForSeconds(attackDuration);
+
+        if (anim != null)
+        {
+            anim.SetBool("2_Attack", false);
+        }
+
+        isAttacking = false;
     }
 
     void CheckFall()
@@ -154,10 +192,10 @@ public class King : MonoBehaviour
     {
         if (anim == null) return;
 
-        bool isWalking = moveInput != 0;
+        bool isWalking = moveInput != 0 && !isAttacking;
         anim.SetBool("1_Move", isWalking);
 
-        bool isJumping = rb.linearVelocity.y > 0.1f && !isGrounded;
+        bool isJumping = rb.linearVelocity.y > 0.1f && !isGrounded && !isAttacking;
         anim.SetBool("7_Jump", isJumping);
 
         if (hasGroundedParam)
