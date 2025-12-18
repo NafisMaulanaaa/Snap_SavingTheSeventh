@@ -26,8 +26,8 @@ public class Health : MonoBehaviour
         }
     }
 
-    private void Update(){
-        if (Input.GetKeyDown(KeyCode.E))
-            TakeDamage(0.5f);
-    }
+    // private void Update(){
+    //     if (Input.GetKeyDown(KeyCode.E))
+    //         TakeDamage(0.5f);
+    // }
 }

@@ -1,15 +1,10 @@
 using UnityEngine;
 
-public class Skeleton : MonoBehaviour
+public class Enemy_Sideways : MonoBehaviour
 {
-    [Header("Movement Settings")]
     [SerializeField] private float movementDistance;
     [SerializeField] private float speed; 
     [SerializeField] private float damage;
-
-    [Header("Animation")]
-    private Animator anim;
-
     private bool movingLeft;
     private float leftEdge;
     private float rightEdge;
@@ -17,21 +12,13 @@ public class Skeleton : MonoBehaviour
     private void Awake(){
         leftEdge = transform.position.x - movementDistance;
         rightEdge = transform.position.x + movementDistance;
-
-        anim = GetComponentInChildren<Animator>();
     }
 
     private void Update(){
-        Move();
-    }
-
-    private void Move(){
         if(movingLeft){
             if(transform.position.x > leftEdge)
             {
                 transform.position = new Vector3(transform.position.x - speed * Time.deltaTime, transform.position.y, transform.position.z);
-                transform.localScale = new Vector3(2, 2, 2);
-
             }
             else 
             {
@@ -42,23 +29,16 @@ public class Skeleton : MonoBehaviour
             if(transform.position.x < rightEdge)
             {
                 transform.position = new Vector3(transform.position.x + speed * Time.deltaTime, transform.position.y, transform.position.z);
-                transform.localScale = new Vector3(-2, 2, 2);
-                
             }
             else 
             {
                 movingLeft = true;
             }
         }
-
-        if (anim != null) 
-        {
-            anim.SetBool("1_Move", true);
-        }
     }
 
     private void OnTriggerEnter2D(Collider2D collison){
-        if (collison.CompareTag("Player"))
+        if (collison.tag == "Player")
         {
             collison.GetComponent<Health>().TakeDamage(damage);
         }
