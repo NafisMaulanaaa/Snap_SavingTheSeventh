@@ -3266,6 +3266,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1130793211}
+  - component: {fileID: 1130793212}
   m_Layer: 0
   m_Name: Portal
   m_TagString: Untagged
@@ -3289,6 +3290,19 @@ Transform:
   - {fileID: 1240182097}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1130793212
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1130793210}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8449ba277713d76449482bcda67e3880, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  namaSceneTujuan: Stage_3
 --- !u!1 &1131005187
 GameObject:
   m_ObjectHideFlags: 0
