@@ -15,7 +15,7 @@ public class King : MonoBehaviour
     public Transform attackPoint;      // Objek kosong di depan King sebagai pusat serangan
     public float attackRange = 0.5f;   // Jangkauan serangan
     public LayerMask enemyLayer;      // Layer khusus untuk Musuh (Skeleton/Enemy)
-    public int attackDamage = 1;       // Besar damage
+    public float attackDamage = 0.5f;       // Besar damage
     public float attackDuration = 0.4f; 
     private bool isAttacking = false;
 

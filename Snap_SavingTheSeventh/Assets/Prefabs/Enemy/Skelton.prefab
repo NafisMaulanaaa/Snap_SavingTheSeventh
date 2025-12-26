@@ -3028,7 +3028,7 @@ MonoBehaviour:
   damage: 0.5
   chaseDistance: 4
   chaseSpeed: 4
-  attackCooldown: 1
+  attackCooldown: 1.5
   attackRange: 1
 --- !u!114 &5355018182752991044
 MonoBehaviour:
