@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;  
 
 public class Health : MonoBehaviour
 {
@@ -41,18 +42,23 @@ private void Die()
         King playerScript = GetComponent<King>();
         if (playerScript != null)
         {
-            StartCoroutine(RespawnPlayer(playerScript));
+            Invoke("GoToGameOverScene", 1f);
         }
         else
         {
             // Jika ini musuh (Skeleton), jalankan logika mati seperti biasa
-            if (GetComponent<Skeleton>() != null) GetComponent<Skeleton>().enabled = false;
-            if (GetComponent<Collider2D>() != null) GetComponent<Collider2D>().enabled = false;
-            if (GetComponent<Rigidbody2D>() != null) GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
+            // if (GetComponent<Skeleton>() != null) GetComponent<Skeleton>().enabled = false;
+            // if (GetComponent<Collider2D>() != null) GetComponent<Collider2D>().enabled = false;
+            // if (GetComponent<Rigidbody2D>() != null) GetComponent<Rigidbody2D>().bodyType = RigidbodyType2D.Static;
 
             Destroy(gameObject, destroyDelay);
         }
     }
+
+    void GoToGameOverScene()
+{
+    SceneManager.LoadScene("GameOver");
+}
 
     // Coroutine baru untuk menangani Respawn Player
     private System.Collections.IEnumerator RespawnPlayer(King player)

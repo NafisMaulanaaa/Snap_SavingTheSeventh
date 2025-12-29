@@ -3,6 +3,9 @@ using UnityEngine.SceneManagement;
 
 public class Portal : MonoBehaviour
 {
+    [Header("UI Reference")]
+    public CoinUI coinUI;
+
     [Header("Portal Settings")]
     [SerializeField] private string namaSceneTujuan;
     
@@ -10,10 +13,25 @@ public class Portal : MonoBehaviour
     public int coinsNeeded = 3;  // Target koin
     public int currentCoins = 0; // Koin yang sudah didapat (bisa dilihat di Inspector)
 
+    private void Start()
+    {
+        if (coinUI != null)
+        {
+            coinUI.UpdateScoreText(currentCoins, coinsNeeded);
+        }
+    }
+
     // Fungsi ini dipanggil oleh coinCollectible
     public void AddCoin()
     {
         currentCoins++;
+        
+        // Update UI setiap kali koin nambah
+        if (coinUI != null)
+        {
+            coinUI.UpdateScoreText(currentCoins, coinsNeeded);
+        }
+
         Debug.Log("Portal mencatat: " + currentCoins + "/" + coinsNeeded + " Koin.");
     }
 

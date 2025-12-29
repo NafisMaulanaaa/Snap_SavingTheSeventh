@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class King : MonoBehaviour
 {
@@ -49,6 +50,7 @@ public class King : MonoBehaviour
 
     void Start()
     {
+        PlayerPrefs.SetInt("LastSceneIndex", SceneManager.GetActiveScene().buildIndex);
         respawnPoint = transform.position;
 
         if (rb == null)
@@ -243,11 +245,26 @@ public class King : MonoBehaviour
     }
 
     // Update fungsi CheckFall agar menggunakan fungsi Respawn yang sama
-    void CheckFall()
+void CheckFall()
     {
         if (transform.position.y < fallLimitY)
         {
-            Respawn();
+            // Ambil komponen Health yang ada di objek ini
+            Health playerHealth = GetComponent<Health>();
+
+            if (playerHealth != null)
+            {
+                // Kurangi darah (misal: jatuh langsung mati atau kurangi 1-2 HP)
+                // Jika ingin langsung mati, masukkan nilai besar (misal: 10 atau playerHealth.currentHealth)
+                playerHealth.TakeDamage(99f); 
+            }
+
+            // Jika darah masih ada, baru respawn manual. 
+            // Jika darah habis (0), script Health.cs yang akan menangani respawn via Die()
+            if (playerHealth != null && playerHealth.currentHealth > 0)
+            {
+                Respawn();
+            }
         }
     }
 
