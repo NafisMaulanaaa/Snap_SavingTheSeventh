@@ -4,7 +4,10 @@ public class CoinCollectible : MonoBehaviour
 {
     [Header("Floating Animation")]
     [SerializeField] private float amplitude = 0.5f; 
-    [SerializeField] private float frequency = 1f;   
+    [SerializeField] private float frequency = 1f;
+
+    [Header("Effects (Optional)")]
+    [SerializeField] private ParticleSystem collectEffect;
 
     private Vector3 startPosition;
 
@@ -23,20 +26,21 @@ public class CoinCollectible : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            // PERUBAHAN DI SINI: Kita cari object "Portal"
-            Portal portalScript = FindFirstObjectByType<Portal>();
-
-            if (portalScript != null)
+            // PAKAI SINGLETON (Lebih simple!)
+            if (Portal.Instance != null)
             {
-                // Lapor ke portal
-                portalScript.AddCoin();
-                
-                // Hancurkan koin
+                Portal.Instance.AddCoin();
+
+                if (collectEffect != null)
+                {
+                    Instantiate(collectEffect, transform.position, Quaternion.identity);
+                }
+
                 Destroy(gameObject);
             }
             else
             {
-                Debug.LogError("GAWAT: Tidak ada object Portal di scene ini!");
+                Debug.LogError("Portal.Instance NULL! Pastikan ada object Portal di scene.");
             }
         }
     }
