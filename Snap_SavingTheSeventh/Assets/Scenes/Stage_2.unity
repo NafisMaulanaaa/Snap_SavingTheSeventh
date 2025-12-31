@@ -48914,7 +48914,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   coinUI: {fileID: 454409651}
   notificationUI: {fileID: 303186421}
-  namaSceneTujuan: Stage_2
+  namaSceneTujuan: Stage_3
   coinsNeeded: 6
   currentCoins: 0
   portalSprite: {fileID: 1564427338}
