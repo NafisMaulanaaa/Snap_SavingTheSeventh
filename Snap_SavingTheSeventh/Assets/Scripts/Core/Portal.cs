@@ -8,6 +8,7 @@ public class Portal : MonoBehaviour
 
     [Header("UI Reference")]
     public CoinUI coinUI;
+    [SerializeField] private NotificationUI notificationUI; // TAMBAH INI
 
     [Header("Scene Settings")]
     [SerializeField] private string namaSceneTujuan;
@@ -17,7 +18,7 @@ public class Portal : MonoBehaviour
     public int currentCoins = 0;
 
     [Header("Portal Visual")]
-    [SerializeField] private SpriteRenderer portalSprite; // GANTI: Pakai SpriteRenderer langsung
+    [SerializeField] private SpriteRenderer portalSprite;
     [SerializeField] private bool useFadeEffect = true;
     [SerializeField] private float fadeInDuration = 0.5f;
 
@@ -43,11 +44,11 @@ public class Portal : MonoBehaviour
 
     private void Start()
     {
-        // SEMBUNYI kan sprite (bukan object!)
+        // Sembunyikan sprite (transparan)
         if (portalSprite != null)
         {
             Color c = portalSprite.color;
-            c.a = 0f; // Transparan
+            c.a = 0f;
             portalSprite.color = c;
         }
         else
@@ -85,6 +86,12 @@ public class Portal : MonoBehaviour
         isUnlocked = true;
         Debug.Log("✨ PORTAL TERBUKA!");
 
+        // TAMPILKAN NOTIFIKASI!
+        if (notificationUI != null)
+        {
+            notificationUI.ShowNotification("Portal telah terbuka!");
+        }
+
         if (unlockEffect != null)
         {
             unlockEffect.Play();
@@ -98,7 +105,7 @@ public class Portal : MonoBehaviour
             }
             else
             {
-                // Langsung muncul (alpha = 1)
+                // Langsung muncul
                 Color c = portalSprite.color;
                 c.a = 1f;
                 portalSprite.color = c;
@@ -116,7 +123,7 @@ public class Portal : MonoBehaviour
         if (portalSprite == null) yield break;
 
         Color originalColor = portalSprite.color;
-        float targetAlpha = originalColor.a == 0f ? 1f : originalColor.a;
+        float targetAlpha = 1f; // Selalu fade ke alpha 1
 
         float elapsed = 0f;
         while (elapsed < fadeInDuration)
