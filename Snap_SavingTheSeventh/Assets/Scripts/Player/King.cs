@@ -38,6 +38,7 @@ public class King : MonoBehaviour
 
     private bool hasGroundedParam = false;
     private float moveInput;
+    private bool isCutscene = false;
 
     // [Header("Attack")]
     // public float attackDuration = 0.4f; 
@@ -103,7 +104,13 @@ public class King : MonoBehaviour
         Move();
         CheckGround();
         Jump();
-        Attack(); // Fungsi ini diperbarui di bawah
+
+        if (!isCutscene) 
+        {
+            Attack();
+        }
+
+        // Attack(); // Fungsi ini diperbarui di bawah
         CheckFall();
         ClampPosition();
         UpdateAnimations();
@@ -268,12 +275,29 @@ void CheckFall()
         }
     }
 
-    void Move() { /* kode lamamu */ if (isAttacking) return; moveInput = Input.GetAxisRaw("Horizontal"); rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y); if (moveInput > 0 && !isFacingRight) Flip(); else if (moveInput < 0 && isFacingRight) Flip(); }
+    void Move() 
+    { 
+        if (isAttacking) return; 
+        if (!isCutscene)
+        {
+            moveInput = Input.GetAxisRaw("Horizontal");
+        }
+        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y); 
+        if (moveInput > 0 && !isFacingRight) Flip(); 
+        else if (moveInput < 0 && isFacingRight) Flip(); 
+    }
+
     void CheckGround() { if (groundCheck == null) return; isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer); }
     void Jump() { if (!isGrounded || isAttacking) return; if (Input.GetKeyDown(KeyCode.Space)) { rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce); isGrounded = false; } }
     void Flip() { isFacingRight = !isFacingRight; Vector3 s = transform.localScale; s.x *= -1; transform.localScale = s; }
     void ClampPosition() { Vector3 pos = transform.position; pos.x = Mathf.Clamp(pos.x, minX, maxX); if (pos.y > maxY) pos.y = maxY; transform.position = pos; }
     void UpdateAnimations() { if (anim == null) return; bool isWalking = moveInput != 0 && !isAttacking; anim.SetBool("1_Move", isWalking); bool isJumping = rb.linearVelocity.y > 0.1f && !isGrounded && !isAttacking; anim.SetBool("7_Jump", isJumping); if (hasGroundedParam) anim.SetBool("Grounded", isGrounded); }
 
+    public void StartAutoWalk(float direction)
+    {
+        isCutscene = true;      // Aktifkan mode cutscene
+        moveInput = direction;  // Paksa isi nilai input (1 = Kanan, -1 = Kiri)
+        Debug.Log("Player mulai jalan sendiri...");
+    }
 }
 

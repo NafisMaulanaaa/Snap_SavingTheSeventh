@@ -110,11 +110,22 @@ public class Portal : MonoBehaviour
                 c.a = 1f;
                 portalSprite.color = c;
                 
-                if (autoLoadScene)
-                {
-                    Invoke(nameof(LoadNextScene), delayBeforeLoad);
-                }
             }
+        }
+        
+        if (autoLoadScene)
+        {
+            // Cari script King di scene
+            // (Ganti 'King' dengan nama script playermu kalau beda)
+            King playerScript = FindFirstObjectByType<King>(); 
+            
+            if (playerScript != null)
+            {
+                // Suruh dia jalan ke KANAN (1f). Kalau mau ke kiri ganti jadi (-1f)
+                playerScript.StartAutoWalk(1f); 
+            }
+            
+            Invoke(nameof(LoadNextScene), delayBeforeLoad);
         }
     }
 
