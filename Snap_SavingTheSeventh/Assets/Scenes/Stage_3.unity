@@ -7792,10 +7792,10 @@ MonoBehaviour:
   target: {fileID: 366327681}
   smoothSpeed: 5
   offset: {x: 0, y: 1, z: -10}
-  minX: 0
+  minX: 2
   maxX: 255
   minY: -10
-  maxY: 2.5
+  maxY: 0.5
 --- !u!114 &839371893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7883,7 +7883,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

@@ -6586,10 +6586,10 @@ MonoBehaviour:
   target: {fileID: 366327681}
   smoothSpeed: 5
   offset: {x: 0, y: 1, z: -10}
-  minX: 0
+  minX: 1
   maxX: 20
   minY: -10
-  maxY: 2.5
+  maxY: 0.5
 --- !u!114 &839371893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6677,7 +6677,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -20340,6 +20340,14 @@ PrefabInstance:
     - target: {fileID: 1908015758693833787, guid: 69b2b94b81c33aa4a9c3fba50c03bee8, type: 3}
       propertyPath: m_Layer
       value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1959893195440175856, guid: 69b2b94b81c33aa4a9c3fba50c03bee8, type: 3}
+      propertyPath: destroyDelay
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1959893195440175856, guid: 69b2b94b81c33aa4a9c3fba50c03bee8, type: 3}
+      propertyPath: startingHealth
+      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2012504205742603700, guid: 69b2b94b81c33aa4a9c3fba50c03bee8, type: 3}
       propertyPath: m_Layer

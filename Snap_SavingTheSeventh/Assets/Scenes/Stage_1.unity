@@ -4436,10 +4436,10 @@ MonoBehaviour:
   target: {fileID: 1146459244}
   smoothSpeed: 5
   offset: {x: 0, y: 1, z: -10}
-  minX: 0
+  minX: 2
   maxX: 209
   minY: -6
-  maxY: 2.5
+  maxY: 1.5
 --- !u!114 &839371893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4527,7 +4527,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 6
+  orthographic size: 8
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -4552,7 +4552,7 @@ Transform:
   m_GameObject: {fileID: 839371891}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -1.08, y: 0.77, z: -10}
+  m_LocalPosition: {x: 0.47, y: 0.77, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
