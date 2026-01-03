@@ -6,7 +6,7 @@ public class BossHealthBar : MonoBehaviour
     [Header("References")]
     [SerializeField] private Health bossHealth;           // Reference ke script Health milik Morgath
     [SerializeField] private Morgath morgathScript;       // Reference ke script Morgath untuk ambil max health
-    [SerializeField] private Image healthBarFill;         // Image di dalam Mask (HealthBarFrame)
+    [SerializeField] private Image healthBarFill;         
     [SerializeField] private Text healthText;             // Text "HP: 100/100"
 
     [Header("Visual Settings")]
@@ -60,10 +60,10 @@ public class BossHealthBar : MonoBehaviour
         }
 
         // Hide HP bar di awal jika penuh
-        if (hideWhenFull && healthBarGroup != null)
-        {
-            healthBarGroup.SetActive(false);
-        }
+        // if (hideWhenFull && healthBarGroup != null)
+        // {
+        //     healthBarGroup.SetActive(false);
+        // }
 
         // Set initial value
         UpdateHealthBar();
@@ -90,10 +90,10 @@ public class BossHealthBar : MonoBehaviour
         UpdateHealthColor(healthPercent);
 
         // Update text HP (optional)
-        if (healthText != null)
-        {
-            healthText.text = $"HP: {Mathf.Ceil(bossHealth.currentHealth)} / {Mathf.Ceil(maxHealth)}";
-        }
+        // if (healthText != null)
+        // {
+        //     healthText.text = $"HP: {Mathf.Ceil(bossHealth.currentHealth)} / {Mathf.Ceil(maxHealth)}";
+        // }
 
         // Show/Hide logic
         if (hideWhenFull && healthBarGroup != null)

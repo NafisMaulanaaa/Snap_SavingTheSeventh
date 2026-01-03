@@ -1,8 +1,29 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Morgath : MonoBehaviour
 {
+    [Header("Transition Settings (Wajib Diisi)")]
+    [SerializeField] private CanvasGroup whiteFlashUI; 
+    [SerializeField] private GameObject humanModel;    
+    [SerializeField] private GameObject monsterModel;  
+    [SerializeField] private BossHealthBar bossHealthBarScript; 
+    [SerializeField] private float fadeDuration = 1.0f; 
+
+    [Header("Phase 2 Hitbox Settings (CAPSULE)")]
+    [SerializeField] private Vector2 monsterColliderSize;   // Ukuran Capsule saat jadi Monster
+    [SerializeField] private Vector2 monsterColliderOffset; // Posisi Capsule saat jadi Monster
+
+    [Header("Scale Settings")]
+    [SerializeField] private float humanScale = 2f;    
+    [SerializeField] private float monsterScale = 3.5f; 
+    private float currentScale; 
+
+    [Header("Boss Stats (HP)")]
+    [SerializeField] private float humanMaxHealth = 25f;   
+    [SerializeField] private float monsterMaxHealth = 30f; 
+
     [Header("Movement Settings")]
     [SerializeField] private float movementDistance;
     [SerializeField] private float speed;
@@ -13,33 +34,36 @@ public class Morgath : MonoBehaviour
     [SerializeField] private float chaseSpeed = 4f;
 
     [Header("Attack Settings")]
-    [SerializeField] private float attackCooldown = 1.5f;
+    [SerializeField] private float attackCooldown = 3f; 
     [SerializeField] private float attackRange = 1.5f;
     private float cooldownTimer = 0;
 
     [Header("Boss Phase Settings")]
-    [SerializeField] private float transformHealthPercent = 0.05f; // 5% HP untuk transform
-    [SerializeField] private RuntimeAnimatorController phase2AnimatorController; // Animator untuk Monster form
-    [SerializeField] private GameObject transformEffect; // Particle effect saat transform (optional)
+    [SerializeField] private float transformHealthPercent = 0.3f; 
+    [SerializeField] private GameObject transformEffect; 
     private bool isPhase2 = false;
     private bool hasTransformed = false;
-    private float maxHealth; // Simpan max health di awal
+    private float maxHealth;
 
     [Header("Skill Settings - Phase 1")]
-    [SerializeField] private float skillCooldown = 8f; // Cooldown untuk skill
+    [SerializeField] private float skillCooldown = 8f;
     [SerializeField] private GameObject sawPrefab;
-    [SerializeField] private GameObject spikePrefab;
     [SerializeField] private GameObject poisonPrefab;
-    [SerializeField] private Transform[] sawSpawnPoints;  // Titik spawn Saw (kiri & kanan)
-    [SerializeField] private Transform[] spikeSpawnPoints; // Titik spawn Spike dari tanah
-    [SerializeField] private Transform poisonSpawnArea;   // Area spawn Poison dari atas
-    [SerializeField] private int poisonDropCount = 5;     // Jumlah poison yang jatuh Phase 1
+
+    [Header("Spawn area/points")]
+    [SerializeField] private float sawSpawnYOffset = 0.5f;
+    [SerializeField] private Transform arenaLeftPoint;
+    [SerializeField] private Transform arenaRightPoint;
+    [SerializeField] private Transform poisonSpawnArea;
+    [SerializeField] private int poisonDropCount = 5;
     private float skillTimer = 0;
 
     [Header("Skill Settings - Phase 2")]
-    [SerializeField] private int phase2PoisonCount = 10;  // Lebih banyak poison di Phase 2
-    private int sawSpawnMultiplier = 1;  // Phase 1 = 1, Phase 2 = 2
-    private int spikeSpawnMultiplier = 1;
+    [SerializeField] private int phase2PoisonCount = 10;
+    private int sawSpawnMultiplier = 1;
+
+    [Header("RNG System (Deck)")]
+    private List<int> skillDeck = new List<int>(); 
 
     [Header("Components")]
     private Animator anim;
@@ -47,22 +71,35 @@ public class Morgath : MonoBehaviour
     private Transform player;
     private Health playerHealth;
     private Health bossHealth;
+    
+    private SpriteRenderer[] spumSprites; 
 
     private bool movingLeft;
     private float leftEdge;
     private float rightEdge;
 
     private enum BossState { Patrol, Chase, MeleeAttack, CastingSkill }
-    private BossState currentState = BossState.Patrol;
+    [SerializeField] private BossState currentState = BossState.Patrol;
     private bool isCasting = false;
 
     private void Awake()
     {
         leftEdge = transform.position.x - movementDistance;
         rightEdge = transform.position.x + movementDistance;
-        anim = GetComponentInChildren<Animator>();
+        
+        // Set Scale Awal (Human)
+        currentScale = humanScale;
+        transform.localScale = new Vector3(currentScale, currentScale, currentScale);
+
+        // Cari Animator di Human
+        if (humanModel != null)
+            anim = humanModel.GetComponentInChildren<Animator>();
+        
         rb = GetComponent<Rigidbody2D>();
         bossHealth = GetComponent<Health>();
+
+        if (humanModel != null)
+            spumSprites = humanModel.GetComponentsInChildren<SpriteRenderer>();
     }
 
     private void Start()
@@ -80,39 +117,63 @@ public class Morgath : MonoBehaviour
         }
         else
         {
-            // Simpan max health di awal game
-            maxHealth = bossHealth.currentHealth;
-            Debug.Log($"[Morgath] Max Health: {maxHealth}");
+            // SETUP AWAL: Set HP sesuai Human (25)
+            bossHealth.UpgradeMaxHealth(humanMaxHealth);
+            maxHealth = humanMaxHealth;
+            
+            // UI Update Awal
+            if (bossHealthBarScript != null)
+            {
+                bossHealthBarScript.SetMaxHealth(humanMaxHealth);
+                bossHealthBarScript.ForceUpdate();
+            }
+
+            if (monsterModel != null) monsterModel.SetActive(false);
+            if (humanModel != null) humanModel.SetActive(true);
         }
+
+        ShuffleDeck();
     }
 
     private void Update()
     {
         if (player == null) return;
 
-        // Cek apakah harus transform ke Phase 2
         CheckPhaseTransition();
 
-        // Tambah timer
         cooldownTimer += Time.deltaTime;
         skillTimer += Time.deltaTime;
 
-        // State machine logic
         if (!isCasting)
         {
             UpdateBossState();
         }
     }
 
+    private void ShuffleDeck()
+    {
+        skillDeck.Clear();
+        skillDeck.Add(0); skillDeck.Add(0); skillDeck.Add(0); // 3x Saw
+        skillDeck.Add(1); // 1x Poison
+
+        for (int i = 0; i < skillDeck.Count; i++)
+        {
+            int temp = skillDeck[i];
+            int randomIndex = Random.Range(i, skillDeck.Count);
+            skillDeck[i] = skillDeck[randomIndex];
+            skillDeck[randomIndex] = temp;
+        }
+    }
+
     private void CheckPhaseTransition()
     {
         if (hasTransformed || bossHealth == null) return;
-
-        // Hitung persentase HP
         float healthPercent = bossHealth.currentHealth / maxHealth;
 
-        if (healthPercent <= transformHealthPercent && !isPhase2)
+        // Berubah saat HP <= 30% atau HP 0 (Safety net)
+        if ((healthPercent <= transformHealthPercent || bossHealth.currentHealth <= 0) && !isPhase2)
         {
+            if (bossHealth.currentHealth <= 0) bossHealth.currentHealth = 1; 
             StartCoroutine(TransformToPhase2());
         }
     }
@@ -121,57 +182,135 @@ public class Morgath : MonoBehaviour
     {
         hasTransformed = true;
         isCasting = true;
-
-        // Hentikan semua gerakan
+        
         rb.linearVelocity = Vector2.zero;
         if (anim != null) anim.SetBool("1_Move", false);
+        
+        Debug.Log("[MORGATH] CAHAYA ILAHI (TRANSISI)!");
 
-        Debug.Log("[MORGATH] TRANSFORMING TO MONSTER FORM!");
+        // 1. FADE IN
+        if (whiteFlashUI != null)
+        {
+            float timer = 0;
+            while (timer < fadeDuration)
+            {
+                timer += Time.deltaTime;
+                whiteFlashUI.alpha = Mathf.Lerp(0f, 1f, timer / fadeDuration);
+                yield return null;
+            }
+            whiteFlashUI.alpha = 1f; 
+        }
 
-        // Spawn effect (optional)
+        // 2. TUKAR MODEL
+        if (humanModel != null) humanModel.SetActive(false); 
+        if (monsterModel != null) monsterModel.SetActive(true);
+
+        // --- UPDATE SCALE JADI MONSTER ---
+        currentScale = monsterScale;
+        float facingDirection = Mathf.Sign(transform.localScale.x);
+        transform.localScale = new Vector3(facingDirection * currentScale, currentScale, currentScale);
+
+        // 3. UPDATE REFERENCE & COLLIDER (MODIFIED FOR CAPSULE)
+        if (monsterModel != null)
+        {
+            anim = monsterModel.GetComponentInChildren<Animator>(); 
+            spumSprites = monsterModel.GetComponentsInChildren<SpriteRenderer>(); 
+            
+            // ============================================
+            // PERBAIKAN UTAMA: PRIORITASKAN CAPSULE COLLIDER
+            // ============================================
+            CapsuleCollider2D capCol = GetComponent<CapsuleCollider2D>();
+            
+            if (capCol != null)
+            {
+                // Simpan size lama untuk debug
+                Vector2 oldSize = capCol.size;
+                
+                // Set ukuran baru dari Inspector
+                capCol.size = monsterColliderSize;    
+                capCol.offset = monsterColliderOffset; 
+
+                Debug.Log($"[Morgath] Capsule Collider Updated! Old: {oldSize} -> New: {capCol.size}");
+            }
+            else
+            {
+                // Fallback ke Box Collider jika Capsule tidak ditemukan (Hanya jaga-jaga)
+                BoxCollider2D col = GetComponent<BoxCollider2D>();
+                if (col != null)
+                {
+                    col.size = monsterColliderSize;    
+                    col.offset = monsterColliderOffset; 
+                    Debug.Log("[Morgath] Warning: CapsuleCollider2D tidak ditemukan, menggunakan BoxCollider2D.");
+                }
+                else
+                {
+                    Debug.LogError("[Morgath] FATAL: Tidak ada Collider 2D yang ditemukan di Boss!");
+                }
+            }
+            // ============================================
+        }
+
+        if (bossHealth != null)
+        {
+            // Update Max Health
+            bossHealth.UpgradeMaxHealth(monsterMaxHealth);
+            
+            // PENTING: Refresh Animator agar Health tau kalau model sudah ganti
+            bossHealth.RefreshAnimator(); 
+        }
+
         if (transformEffect != null)
-        {
             Instantiate(transformEffect, transform.position, Quaternion.identity);
-        }
 
-        // Delay untuk animasi transform
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(0.5f);
 
-        // Ganti Animator Controller
-        if (phase2AnimatorController != null && anim != null)
+        // --- UPDATE HP MONSTER (25 -> 30) ---
+        bossHealth.UpgradeMaxHealth(monsterMaxHealth); // Set Max HP jadi 30 & isi full
+        maxHealth = monsterMaxHealth;
+
+        // Update UI
+        if (bossHealthBarScript != null)
         {
-            anim.runtimeAnimatorController = phase2AnimatorController;
-            Debug.Log("[Morgath] Animator diganti ke Monster form!");
+            bossHealthBarScript.SetMaxHealth(monsterMaxHealth);
+            bossHealthBarScript.ForceUpdate();
         }
+        
+        Debug.Log($"[Morgath] HP Upgraded to {monsterMaxHealth}");
 
-        // Aktifkan Phase 2
         isPhase2 = true;
         sawSpawnMultiplier = 2;
-        spikeSpawnMultiplier = 2;
-
-        // Buff stats (optional)
         chaseSpeed *= 1.3f;
         attackCooldown *= 0.8f;
         skillCooldown *= 0.7f;
 
+        // 4. FADE OUT
+        if (whiteFlashUI != null)
+        {
+            float timer = 0;
+            while (timer < fadeDuration)
+            {
+                timer += Time.deltaTime;
+                whiteFlashUI.alpha = Mathf.Lerp(1f, 0f, timer / fadeDuration);
+                yield return null;
+            }
+            whiteFlashUI.alpha = 0f;
+        }
+
         isCasting = false;
-        Debug.Log("[MORGATH] PHASE 2 ACTIVATED!");
+        Debug.Log("[MORGATH] PHASE 2 START!");
     }
 
     private void UpdateBossState()
     {
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-        bool isPlayerInBounds = player.position.x >= leftEdge && player.position.x <= rightEdge;
-
-        // Prioritas skill casting
-        if (skillTimer >= skillCooldown && isPlayerInBounds)
+        
+        if (skillTimer >= skillCooldown)
         {
             StartCoroutine(CastRandomSkill());
             return;
         }
 
-        // Jika dekat dengan player
-        if (distanceToPlayer < chaseDistance && isPlayerInBounds)
+        if (distanceToPlayer < chaseDistance)
         {
             if (distanceToPlayer <= attackRange)
             {
@@ -196,93 +335,77 @@ public class Morgath : MonoBehaviour
         isCasting = true;
         skillTimer = 0;
 
-        // Hentikan gerakan
         rb.linearVelocity = Vector2.zero;
         if (anim != null) anim.SetBool("1_Move", false);
 
-        // Random skill (0 = Saw, 1 = Spike, 2 = Poison)
-        int randomSkill = Random.Range(0, 3);
+        if (skillDeck.Count == 0) ShuffleDeck();
 
-        Debug.Log($"[Morgath] Casting Skill {randomSkill}");
+        int selectedSkill = skillDeck[0];
+        skillDeck.RemoveAt(0);
 
-        // Delay casting animation (bisa tambahin trigger animasi "Cast" di sini)
+        if (selectedSkill == 0)
+        {
+            StartCoroutine(PlayWarningFlash());
+        }
+
         yield return new WaitForSeconds(0.8f);
 
-        switch (randomSkill)
+        switch (selectedSkill)
         {
-            case 0:
-                SpawnSaws();
-                break;
-            case 1:
-                SpawnSpikes();
-                break;
-            case 2:
-                SpawnPoisonRain();
-                break;
+            case 0: SpawnSaws(); break;
+            case 1: SpawnPoisonRain(); break;
         }
 
         yield return new WaitForSeconds(0.5f);
         isCasting = false;
     }
 
-    private void SpawnSaws()
+    private IEnumerator PlayWarningFlash()
     {
-        if (sawPrefab == null || sawSpawnPoints == null || sawSpawnPoints.Length == 0)
+        for (int i = 0; i < 3; i++)
         {
-            Debug.LogWarning("[Morgath] Saw Prefab atau Spawn Points belum di-set!");
-            return;
+            SetSpumColor(Color.red);
+            yield return new WaitForSeconds(0.1f);
+            SetSpumColor(Color.white);
+            yield return new WaitForSeconds(0.1f);
         }
-
-        int spawnCount = sawSpawnMultiplier; // Phase 1 = 1, Phase 2 = 2
-
-        for (int i = 0; i < spawnCount; i++)
-        {
-            Transform spawnPoint = sawSpawnPoints[Random.Range(0, sawSpawnPoints.Length)];
-            Instantiate(sawPrefab, spawnPoint.position, Quaternion.identity);
-        }
-
-        Debug.Log($"[Morgath] Spawned {spawnCount} Saw(s)!");
     }
 
-    private void SpawnSpikes()
+    private void SetSpumColor(Color color)
     {
-        if (spikePrefab == null || spikeSpawnPoints == null || spikeSpawnPoints.Length == 0)
+        if (spumSprites != null)
         {
-            Debug.LogWarning("[Morgath] Spike Prefab atau Spawn Points belum di-set!");
-            return;
+            foreach (SpriteRenderer sr in spumSprites)
+            {
+                if (sr != null) sr.color = color;
+            }
         }
+    }
 
-        int spawnCount = spikeSpawnMultiplier;
+    private void SpawnSaws()
+    {
+        if (sawPrefab == null) return;
+        int facingDir = transform.localScale.x > 0 ? -1 : 1;
+        float spawnX = transform.position.x + (facingDir * 1.5f);
+        float spawnY = transform.position.y + sawSpawnYOffset;
+        Vector3 spawnPos = new Vector3(spawnX, spawnY, 0);
 
-        for (int i = 0; i < spawnCount; i++)
-        {
-            Transform spawnPoint = spikeSpawnPoints[Random.Range(0, spikeSpawnPoints.Length)];
-            Instantiate(spikePrefab, spawnPoint.position, Quaternion.identity);
-        }
-
-        Debug.Log($"[Morgath] Spawned {spawnCount} Spike(s)!");
+        GameObject saw = Instantiate(sawPrefab, spawnPos, Quaternion.identity);
+        SawFinalStage sawScript = saw.GetComponent<SawFinalStage>();
+        if (sawScript != null) sawScript.Setup(facingDir);
     }
 
     private void SpawnPoisonRain()
     {
-        if (poisonPrefab == null || poisonSpawnArea == null)
-        {
-            Debug.LogWarning("[Morgath] Poison Prefab atau Spawn Area belum di-set!");
-            return;
-        }
-
+        if (poisonPrefab == null) return;
         int dropCount = isPhase2 ? phase2PoisonCount : poisonDropCount;
 
         for (int i = 0; i < dropCount; i++)
         {
-            // Random posisi X di dalam area spawn
-            float randomX = Random.Range(leftEdge, rightEdge);
+            float randomX = Random.Range(arenaLeftPoint.position.x, arenaRightPoint.position.x);
             Vector3 spawnPos = new Vector3(randomX, poisonSpawnArea.position.y, 0);
-
             Instantiate(poisonPrefab, spawnPos, Quaternion.identity);
         }
-
-        Debug.Log($"[Morgath] Spawned {dropCount} Poison Drops!");
     }
 
     private void AttackLogic()
@@ -294,9 +417,7 @@ public class Morgath : MonoBehaviour
         {
             cooldownTimer = 0;
             if (anim != null) anim.SetTrigger("2_Attack");
-
-            if (playerHealth != null)
-                playerHealth.TakeDamage(damage);
+            if (playerHealth != null) playerHealth.TakeDamage(damage);
         }
     }
 
@@ -307,42 +428,29 @@ public class Morgath : MonoBehaviour
             if (transform.position.x > leftEdge)
             {
                 rb.linearVelocity = new Vector2(-speed, rb.linearVelocity.y);
-                transform.localScale = new Vector3(2f, 2f, 2f);
+                transform.localScale = new Vector3(currentScale, currentScale, currentScale);
             }
-            else
-            {
-                movingLeft = false;
-            }
+            else movingLeft = false;
         }
         else
         {
             if (transform.position.x < rightEdge)
             {
                 rb.linearVelocity = new Vector2(speed, rb.linearVelocity.y);
-                transform.localScale = new Vector3(-2f, 2f, 2f);
+                transform.localScale = new Vector3(-currentScale, currentScale, currentScale);
             }
-            else
-            {
-                movingLeft = true;
-            }
+            else movingLeft = true;
         }
-
         if (anim != null) anim.SetBool("1_Move", true);
     }
 
     private void Chase()
     {
         float dir = Mathf.Sign(player.position.x - transform.position.x);
-
-        if ((dir < 0 && transform.position.x <= leftEdge) || (dir > 0 && transform.position.x >= rightEdge))
-        {
-            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-            if (anim != null) anim.SetBool("1_Move", false);
-            return;
-        }
-
         rb.linearVelocity = new Vector2(dir * chaseSpeed, rb.linearVelocity.y);
-        transform.localScale = new Vector3(dir < 0 ? 2f : -2f, 2f, 2f);
+        
+        transform.localScale = new Vector3(dir < 0 ? currentScale : -currentScale, currentScale, currentScale);
+        
         if (anim != null) anim.SetBool("1_Move", true);
     }
 
@@ -350,23 +458,16 @@ public class Morgath : MonoBehaviour
     {
         Gizmos.color = Color.green;
         Gizmos.DrawLine(new Vector3(leftEdge, transform.position.y, 0), new Vector3(rightEdge, transform.position.y, 0));
-
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, attackRange);
-
         Gizmos.color = Color.cyan;
         Gizmos.DrawWireSphere(transform.position, chaseDistance);
-
-        if (poisonSpawnArea != null)
-        {
+        if (poisonSpawnArea != null) {
             Gizmos.color = Color.magenta;
             Gizmos.DrawWireSphere(poisonSpawnArea.position, 1f);
         }
     }
 
-    // Public method untuk BossHealthBar bisa akses max health
-    public float GetMaxHealth()
-    {
-        return maxHealth;
-    }
+    public float GetMaxHealth() { return maxHealth; }
+    public bool IsPhase2Activated() { return isPhase2; }
 }
