@@ -1046,8 +1046,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: cadad7501af0b1342b3a82626a625b7d, type: 3}
     - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
       propertyPath: m_SortingOrder
       value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 276026867
       objectReference: {fileID: 0}
     - target: {fileID: 5229868783121585113, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
       propertyPath: m_Name
@@ -1304,6 +1312,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: cadad7501af0b1342b3a82626a625b7d, type: 3}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 276026867
+      objectReference: {fileID: 0}
     - target: {fileID: 5229868783121585113, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
       propertyPath: m_Name
       value: HealthCollectible (4)
@@ -1448,6 +1464,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: cadad7501af0b1342b3a82626a625b7d, type: 3}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 276026867
+      objectReference: {fileID: 0}
     - target: {fileID: 5229868783121585113, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
       propertyPath: m_Name
       value: HealthCollectible (3)
@@ -4281,6 +4305,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: cadad7501af0b1342b3a82626a625b7d, type: 3}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 276026867
+      objectReference: {fileID: 0}
     - target: {fileID: 5229868783121585113, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
       propertyPath: m_Name
       value: HealthCollectible (5)
@@ -8634,6 +8666,14 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: cadad7501af0b1342b3a82626a625b7d, type: 3}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayer
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3388332615342197677, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
+      propertyPath: m_SortingLayerID
+      value: 276026867
+      objectReference: {fileID: 0}
     - target: {fileID: 5229868783121585113, guid: 4b57feb008aa3414ca5181bb7276981c, type: 3}
       propertyPath: m_Name
       value: HealthCollectible (1)
