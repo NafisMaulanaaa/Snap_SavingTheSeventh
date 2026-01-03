@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 74815ced1cc54e147b4f5b6804cde6d3
+guid: cd17d4549aace684b94e153d5ddcb986
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -3308591120925796801
-    second: castle inside_0
+      213: -1480691434465605552
+    second: markas_morgath_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: castle inside_0
+      name: markas_morgath_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1121
-        height: 702
+        width: 1536
+        height: 1024
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: f36d43ab7e58512d0800000000000000
-      internalID: -3308591120925796801
+      spriteID: 058c6b24cf6837be0800000000000000
+      internalID: -1480691434465605552
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      castle inside_0: -3308591120925796801
+      markas_morgath_0: -1480691434465605552
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
