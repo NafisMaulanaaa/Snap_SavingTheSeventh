@@ -8,6 +8,9 @@ public class Dialogue_1 : MonoBehaviour
     public TextMeshProUGUI textComponent;
     public string[] lines;
     public float textSpeed;
+    
+    [Header("Next Dialogue")]
+    public GameObject nextDialogBox; // Assign DialogBox di Inspector
 
     private int index;
 
@@ -60,7 +63,18 @@ public class Dialogue_1 : MonoBehaviour
         }
         else
         {
-            gameObject.SetActive(false);
+            EndDialogue();
+        }
+    }
+    
+    void EndDialogue()
+    {
+        gameObject.SetActive(false);
+        
+        // Aktifkan dialog box berikutnya
+        if (nextDialogBox != null)
+        {
+            nextDialogBox.SetActive(true);
         }
     }
 }
