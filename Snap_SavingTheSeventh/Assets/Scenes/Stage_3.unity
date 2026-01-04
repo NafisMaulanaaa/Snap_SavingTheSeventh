@@ -5272,7 +5272,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 366327675}
   m_LocalRotation: {x: 0, y: 0.008726558, z: 0, w: 0.999962}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 4.4}
   m_LocalScale: {x: -2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -5283,7 +5283,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 1, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 254.8, y: 0.6}
+  m_AnchoredPosition: {x: 1.7, y: 0.6}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &380049375
@@ -42288,7 +42288,7 @@ MonoBehaviour:
   notificationUI: {fileID: 1206006292}
   namaSceneTujuan: Cutscene_5
   coinsNeeded: 9
-  currentCoins: 8
+  currentCoins: 0
   portalSprite: {fileID: 0}
   useFadeEffect: 0
   fadeInDuration: 0.5
@@ -44294,7 +44294,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: cf70ac9e1ebadd044b875cd7014e36c1, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 0.02
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -44394,7 +44394,7 @@ MonoBehaviour:
   sfxSource: {fileID: 0}
   sceneMusic: {fileID: 8300000, guid: cf70ac9e1ebadd044b875cd7014e36c1, type: 3}
   playOnStart: 1
-  musicVolume: 0.02
+  musicVolume: 1
   sfxVolume: 1
 --- !u!4 &1897293260
 Transform:
