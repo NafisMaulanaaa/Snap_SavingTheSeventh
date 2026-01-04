@@ -3025,8 +3025,8 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 11b13c4724b3d4b4e9b76a74c3d1e3b1, type: 3}
-  m_PlayOnAwake: 0
-  m_Volume: 1
+  m_PlayOnAwake: 1
+  m_Volume: 0.05
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -3126,7 +3126,7 @@ MonoBehaviour:
   sfxSource: {fileID: 0}
   sceneMusic: {fileID: 8300000, guid: 11b13c4724b3d4b4e9b76a74c3d1e3b1, type: 3}
   playOnStart: 1
-  musicVolume: 1
+  musicVolume: 0.05
   sfxVolume: 1
 --- !u!4 &623253754
 Transform:
