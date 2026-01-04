@@ -28,6 +28,13 @@ public class Health : MonoBehaviour
         {
             // Jika referensi anim belum di-update, dia akan panggil animasi Human
             if (anim != null) anim.SetTrigger("3_Damaged");
+            
+            // PLAY HIT SOUND
+            King king = GetComponent<King>();
+            if (king != null)
+            {
+                king.PlayHitSound();
+            }
         }
         else
         {
@@ -39,30 +46,42 @@ public class Health : MonoBehaviour
     {
         if (dead) return;
 
-        // --- LOGIC KHUSUS BOSS (MORGATH) ---
         Morgath bossScript = GetComponent<Morgath>();
         
-        if (bossScript != null)
+        // --- LOGIC KHUSUS BOSS (MORGATH) ---
+        // Cegah boss mati di Phase 1 (saat transisi ke Phase 2)
+        if (bossScript != null && !bossScript.IsPhase2Activated())
         {
-            if (!bossScript.IsPhase2Activated())
-            {
-                return; 
-            }
+            return; 
         }
-        // -----------------------------------
 
         dead = true;
 
+        // Gunakan parameter animasi yang konsisten. 
+        // Jika di Animator kamu namanya "4_Death", pakai itu.
         if (anim != null) anim.SetTrigger("4_Death");
+        
+        // Suara kematian (jika ada script King/Audio)
+        King king = GetComponent<King>();
+        if (king != null) king.PlayDeathSound();
 
-        King playerScript = GetComponent<King>();
-        if (playerScript != null)
+        // LOGIC PERPINDAHAN SCENE
+        if (king != null && gameObject.CompareTag("Player")) 
         {
+            // Jika yang mati adalah Player
             Invoke("GoToGameOverScene", 1f);
+        }
+        else if (bossScript != null)
+        {
+            // JIKA INI BOSS: 
+            // Kita DIAMKAN saja di sini. 
+            // Biarkan Coroutine 'HandleBossDeath' di script Morgath yang bekerja
+            // untuk menghitung delay 1.5 detik lalu pindah scene.
+            Debug.Log("[Health] Morgath tewas. Menunggu script Morgath untuk pindah scene...");
         }
         else
         {
-            if (bossScript != null) bossScript.enabled = false;
+            // JIKA INI MUSUH BIASA (BUKAN BOSS / BUKAN PLAYER)
             Destroy(gameObject, destroyDelay);
         }
     }

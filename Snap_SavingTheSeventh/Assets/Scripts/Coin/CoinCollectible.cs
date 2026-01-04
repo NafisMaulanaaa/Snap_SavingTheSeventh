@@ -8,6 +8,9 @@ public class CoinCollectible : MonoBehaviour
 
     [Header("Effects (Optional)")]
     [SerializeField] private ParticleSystem collectEffect;
+    
+    [Header("Audio")]
+    [SerializeField] private AudioClip coinSound;
 
     private Vector3 startPosition;
 
@@ -30,6 +33,12 @@ public class CoinCollectible : MonoBehaviour
             if (Portal.Instance != null)
             {
                 Portal.Instance.AddCoin();
+
+                // PLAY COIN SOUND (Cara Alternatif)
+                if (coinSound != null)
+                {
+                    AudioSource.PlayClipAtPoint(coinSound, transform.position);
+                }
 
                 if (collectEffect != null)
                 {

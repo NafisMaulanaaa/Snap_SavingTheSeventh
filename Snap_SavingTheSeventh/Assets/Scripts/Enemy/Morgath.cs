@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class Morgath : MonoBehaviour
 {
@@ -12,8 +13,8 @@ public class Morgath : MonoBehaviour
     [SerializeField] private float fadeDuration = 1.0f; 
 
     [Header("Phase 2 Hitbox Settings (CAPSULE)")]
-    [SerializeField] private Vector2 monsterColliderSize;   // Ukuran Capsule saat jadi Monster
-    [SerializeField] private Vector2 monsterColliderOffset; // Posisi Capsule saat jadi Monster
+    [SerializeField] private Vector2 monsterColliderSize;
+    [SerializeField] private Vector2 monsterColliderOffset;
 
     [Header("Scale Settings")]
     [SerializeField] private float humanScale = 2f;    
@@ -62,6 +63,16 @@ public class Morgath : MonoBehaviour
     [SerializeField] private int phase2PoisonCount = 10;
     private int sawSpawnMultiplier = 1;
 
+    [Header("Audio Settings")]
+    [SerializeField] private AudioClip[] humanVoiceClips;      // Array suara human (bisa banyak)
+    [SerializeField] private AudioClip[] monsterVoiceClips;    // Array suara monster (bisa banyak)
+    [SerializeField] private AudioClip transformSound;          // Sound pas transform
+    [SerializeField] private float voiceCooldownMin = 7f;      // Minimal jeda suara
+    [SerializeField] private float voiceCooldownMax = 7f;      // Maksimal jeda suara
+    private AudioSource audioSource;
+    private float voiceTimer = 0f;
+    private float nextVoiceTime = 0f;
+
     [Header("RNG System (Deck)")]
     private List<int> skillDeck = new List<int>(); 
 
@@ -82,16 +93,19 @@ public class Morgath : MonoBehaviour
     [SerializeField] private BossState currentState = BossState.Patrol;
     private bool isCasting = false;
 
+    [Header("Death Settings")]
+    [SerializeField] private string nextSceneName; 
+    [SerializeField] private float deathDelay = 2.0f;
+    private bool isDead = false;
+
     private void Awake()
     {
         leftEdge = transform.position.x - movementDistance;
         rightEdge = transform.position.x + movementDistance;
         
-        // Set Scale Awal (Human)
         currentScale = humanScale;
         transform.localScale = new Vector3(currentScale, currentScale, currentScale);
 
-        // Cari Animator di Human
         if (humanModel != null)
             anim = humanModel.GetComponentInChildren<Animator>();
         
@@ -100,6 +114,18 @@ public class Morgath : MonoBehaviour
 
         if (humanModel != null)
             spumSprites = humanModel.GetComponentsInChildren<SpriteRenderer>();
+        
+        // Setup Audio
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0f; // 2D sound
+        
+        // Set jeda suara pertama
+        nextVoiceTime = Random.Range(voiceCooldownMin, voiceCooldownMax);
     }
 
     private void Start()
@@ -117,11 +143,9 @@ public class Morgath : MonoBehaviour
         }
         else
         {
-            // SETUP AWAL: Set HP sesuai Human (25)
             bossHealth.UpgradeMaxHealth(humanMaxHealth);
             maxHealth = humanMaxHealth;
             
-            // UI Update Awal
             if (bossHealthBarScript != null)
             {
                 bossHealthBarScript.SetMaxHealth(humanMaxHealth);
@@ -137,12 +161,27 @@ public class Morgath : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
+        if (player == null || isDead) return;
+
+        // Cek jika HP Boss habis
+        if (bossHealth != null && bossHealth.currentHealth <= 0)
+        {
+            StartCoroutine(HandleBossDeath());
+            return; 
+        }
 
         CheckPhaseTransition();
 
         cooldownTimer += Time.deltaTime;
         skillTimer += Time.deltaTime;
+        voiceTimer += Time.deltaTime;
+        
+        // Play voice setiap 3-4 detik
+        if (voiceTimer >= 7f) 
+        {
+            PlayRandomVoice();
+            voiceTimer = 0f;
+        }
 
         if (!isCasting)
         {
@@ -150,11 +189,67 @@ public class Morgath : MonoBehaviour
         }
     }
 
+    private IEnumerator HandleBossDeath()
+    {
+        isDead = true; // Kunci agar tidak terpanggil berulang kali
+        
+        Debug.Log("Morgath Mati. Memulai proses delay...");
+
+        // 1. Hentikan semua gerakan fisik
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero; // Berhenti seketika
+            rb.bodyType = RigidbodyType2D.Kinematic; // Agar tidak terpengaruh gravitasi/dorongan
+        }
+
+        // 2. Samakan Trigger Animasi dengan Health.cs
+        // Kamu pakai "4_Death" di script Health, jadi pakai itu juga di sini
+        if (anim != null) 
+        {
+            anim.SetTrigger("4_Death"); 
+        }
+
+        // 3. Matikan Collider (Opsional tapi disarankan)
+        // Agar Player bisa lewat/tidak menabrak mayat Boss selama delay
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
+
+        // 4. Tunggu selama delay (Misal 2 detik)
+        yield return new WaitForSeconds(deathDelay);
+
+        // 5. Pindah ke scene selanjutnya
+        if (!string.IsNullOrEmpty(nextSceneName))
+        {
+            SceneManager.LoadScene(nextSceneName);
+        }
+        else
+        {
+            Debug.LogError("[MORGATH] ERROR: Nama Scene tujuan kosong di Inspector!");
+        }
+    }
+
+    private void PlayRandomVoice()
+    {
+        AudioClip[] voiceClips = isPhase2 ? monsterVoiceClips : humanVoiceClips;
+        
+        if (voiceClips != null && voiceClips.Length > 0 && audioSource != null)
+        {
+            // Pilih random voice dari array
+            int randomIndex = Random.Range(0, voiceClips.Length);
+            AudioClip selectedVoice = voiceClips[randomIndex];
+            
+            if (selectedVoice != null)
+            {
+                audioSource.PlayOneShot(selectedVoice);
+            }
+        }
+    }
+
     private void ShuffleDeck()
     {
         skillDeck.Clear();
-        skillDeck.Add(0); skillDeck.Add(0); skillDeck.Add(0); // 3x Saw
-        skillDeck.Add(1); // 1x Poison
+        skillDeck.Add(0); skillDeck.Add(0); skillDeck.Add(0);
+        skillDeck.Add(1);
 
         for (int i = 0; i < skillDeck.Count; i++)
         {
@@ -170,7 +265,6 @@ public class Morgath : MonoBehaviour
         if (hasTransformed || bossHealth == null) return;
         float healthPercent = bossHealth.currentHealth / maxHealth;
 
-        // Berubah saat HP <= 30% atau HP 0 (Safety net)
         if ((healthPercent <= transformHealthPercent || bossHealth.currentHealth <= 0) && !isPhase2)
         {
             if (bossHealth.currentHealth <= 0) bossHealth.currentHealth = 1; 
@@ -187,6 +281,12 @@ public class Morgath : MonoBehaviour
         if (anim != null) anim.SetBool("1_Move", false);
         
         Debug.Log("[MORGATH] CAHAYA ILAHI (TRANSISI)!");
+        
+        // PLAY TRANSFORM SOUND
+        if (transformSound != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(transformSound);
+        }
 
         // 1. FADE IN
         if (whiteFlashUI != null)
@@ -205,36 +305,27 @@ public class Morgath : MonoBehaviour
         if (humanModel != null) humanModel.SetActive(false); 
         if (monsterModel != null) monsterModel.SetActive(true);
 
-        // --- UPDATE SCALE JADI MONSTER ---
         currentScale = monsterScale;
         float facingDirection = Mathf.Sign(transform.localScale.x);
         transform.localScale = new Vector3(facingDirection * currentScale, currentScale, currentScale);
 
-        // 3. UPDATE REFERENCE & COLLIDER (MODIFIED FOR CAPSULE)
+        // 3. UPDATE REFERENCE & COLLIDER
         if (monsterModel != null)
         {
             anim = monsterModel.GetComponentInChildren<Animator>(); 
             spumSprites = monsterModel.GetComponentsInChildren<SpriteRenderer>(); 
             
-            // ============================================
-            // PERBAIKAN UTAMA: PRIORITASKAN CAPSULE COLLIDER
-            // ============================================
             CapsuleCollider2D capCol = GetComponent<CapsuleCollider2D>();
             
             if (capCol != null)
             {
-                // Simpan size lama untuk debug
                 Vector2 oldSize = capCol.size;
-                
-                // Set ukuran baru dari Inspector
                 capCol.size = monsterColliderSize;    
                 capCol.offset = monsterColliderOffset; 
-
                 Debug.Log($"[Morgath] Capsule Collider Updated! Old: {oldSize} -> New: {capCol.size}");
             }
             else
             {
-                // Fallback ke Box Collider jika Capsule tidak ditemukan (Hanya jaga-jaga)
                 BoxCollider2D col = GetComponent<BoxCollider2D>();
                 if (col != null)
                 {
@@ -247,15 +338,11 @@ public class Morgath : MonoBehaviour
                     Debug.LogError("[Morgath] FATAL: Tidak ada Collider 2D yang ditemukan di Boss!");
                 }
             }
-            // ============================================
         }
 
         if (bossHealth != null)
         {
-            // Update Max Health
             bossHealth.UpgradeMaxHealth(monsterMaxHealth);
-            
-            // PENTING: Refresh Animator agar Health tau kalau model sudah ganti
             bossHealth.RefreshAnimator(); 
         }
 
@@ -264,11 +351,9 @@ public class Morgath : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        // --- UPDATE HP MONSTER (25 -> 30) ---
-        bossHealth.UpgradeMaxHealth(monsterMaxHealth); // Set Max HP jadi 30 & isi full
+        bossHealth.UpgradeMaxHealth(monsterMaxHealth);
         maxHealth = monsterMaxHealth;
 
-        // Update UI
         if (bossHealthBarScript != null)
         {
             bossHealthBarScript.SetMaxHealth(monsterMaxHealth);

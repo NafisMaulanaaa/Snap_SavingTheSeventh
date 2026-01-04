@@ -15,8 +15,14 @@ public class DialogueWithCharacter : MonoBehaviour
     public DialogueLine[] dialogueLines;
     public float textSpeed;
     
-    [Header("Next Dialogue")]
-    public GameObject nextDialogBox;
+    [Header("Next Action")]
+    public GameObject nextDialogBox; // Untuk dialog berikutnya
+    public bool loadSceneAfterDialogue = false; // Centang ini kalau mau pindah scene
+    public string sceneToLoad; // Nama scene yang mau di-load
+    public float delayBeforeTransition = 0.5f; // Delay sebelum transisi
+    
+    [Header("Audio Control")]
+    public bool stopCutsceneAudio = false; // Centang ini kalau mau stop cutscene audio
 
     private int index;
 
@@ -63,6 +69,11 @@ public class DialogueWithCharacter : MonoBehaviour
         if (characterImage != null && currentLine.characterSprite != null)
         {
             characterImage.sprite = currentLine.characterSprite;
+            characterImage.enabled = true;
+        }
+        else if (characterImage != null)
+        {
+            characterImage.enabled = false; // Sembunyikan kalau tidak ada sprite
         }
         
         textComponent.text = string.Empty;
@@ -83,15 +94,37 @@ public class DialogueWithCharacter : MonoBehaviour
         }
         else
         {
-            EndDialogue();
+            StartCoroutine(EndDialogue());
         }
     }
     
-    void EndDialogue()
+    IEnumerator EndDialogue()
     {
+        yield return new WaitForSeconds(delayBeforeTransition);
+        
         gameObject.SetActive(false);
         
-        if (nextDialogBox != null)
+        // Stop cutscene audio kalau dicentang
+        if (stopCutsceneAudio && CutsceneAudioManager.Instance != null)
+        {
+            CutsceneAudioManager.Instance.StopAndDestroy();
+        }
+        
+        // Kalau mau pindah scene
+        if (loadSceneAfterDialogue && !string.IsNullOrEmpty(sceneToLoad))
+        {
+            if (FadeManager.Instance != null)
+            {
+                FadeManager.Instance.LoadSceneWithFade(sceneToLoad);
+            }
+            else
+            {
+                Debug.LogWarning("FadeManager tidak ditemukan! Loading scene tanpa fade.");
+                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneToLoad);
+            }
+        }
+        // Kalau mau lanjut ke dialog berikutnya
+        else if (nextDialogBox != null)
         {
             nextDialogBox.SetActive(true);
         }

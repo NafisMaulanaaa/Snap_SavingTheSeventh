@@ -20,6 +20,12 @@ public class King : MonoBehaviour
     public float attackDuration = 0.4f; 
     private bool isAttacking = false;
 
+    [Header("Audio Settings")]
+    public AudioClip attackSound;
+    public AudioClip hitSound;
+    public AudioClip deathSound;
+    private AudioSource audioSource;
+
     [Header("Respawn")]
     public Vector2 respawnPoint;
     public float fallLimitY = -10f;
@@ -43,6 +49,14 @@ public class King : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+        }
+        audioSource.playOnAwake = false;
+        audioSource.spatialBlend = 0f;
     }
 
     void Start()
@@ -130,6 +144,8 @@ public class King : MonoBehaviour
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
 
             if (anim != null) anim.SetBool("2_Attack", true);
+            
+            PlaySound(attackSound);
 
             Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(attackPoint.position, attackRange, enemyLayer);
 
@@ -152,6 +168,24 @@ public class King : MonoBehaviour
         yield return new WaitForSeconds(attackDuration);
         if (anim != null) anim.SetBool("2_Attack", false);
         isAttacking = false;
+    }
+
+    public void PlayHitSound()
+    {
+        PlaySound(hitSound);
+    }
+
+    public void PlayDeathSound()
+    {
+        PlaySound(deathSound);
+    }
+
+    void PlaySound(AudioClip clip)
+    {
+        if (clip != null && audioSource != null)
+        {
+            audioSource.PlayOneShot(clip);
+        }
     }
 
     public void Respawn()

@@ -3,24 +3,19 @@ using UnityEngine;
 public class HealthRain : MonoBehaviour
 {
     [Header("Settings")]
-    [SerializeField] private float healthValue = 10f; // Kasih nilai default biar aman
+    [SerializeField] private float healthValue = 10f;
 
     [Tooltip("Peluang item ini memberikan damage (0 = Tidak Pernah, 1 = Selalu, 0.5 = 50:50)")]
     [Range(0f, 1f)]
     [SerializeField] private float badLuckChance = 0.5f;
+    
+    [Header("Audio")]
+    [SerializeField] private AudioClip collectSound;
 
-    // Bagian Start & Update boleh dihapus kalau tidak dipakai floating-nya
-    // private Vector3 startPosition;
-    // private void Start() { startPosition = transform.position; }
-
-    // PERBAIKAN DI SINI:
-    // Gunakan 'Collision2D', bukan 'Collider2D'
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // Harus pakai .gameObject dulu baru bisa cek Tag
         if (collision.gameObject.CompareTag("Player"))
         {
-            // Pakai .gameObject dulu baru GetComponent
             Health playerHealth = collision.gameObject.GetComponent<Health>();
 
             if (playerHealth != null)
@@ -38,9 +33,12 @@ public class HealthRain : MonoBehaviour
                     Debug.Log("Beruntung! Darah bertambah.");
                 }
 
-                // Matikan/Hancurkan item setelah diambil
-                // Gunakan Destroy() kalau mau hilang permanen, atau SetActive(false) kalau mau di-pool
-                Destroy(gameObject); 
+                if (collectSound != null)
+                {
+                    AudioSource.PlayClipAtPoint(collectSound, transform.position);
+                }
+
+                Destroy(gameObject);
             }
         }
     }

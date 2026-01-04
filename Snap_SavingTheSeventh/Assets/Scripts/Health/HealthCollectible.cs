@@ -10,21 +10,21 @@ public class HealthCollectible : MonoBehaviour
     [SerializeField] private float badLuckChance = 0.5f;
 
     [Header("Floating Animation")]
-    [SerializeField] private float amplitude = 0.5f; // Seberapa tinggi naiknya
-    [SerializeField] private float frequency = 1f;   // Seberapa cepat gerakannya
+    [SerializeField] private float amplitude = 0.5f;
+    [SerializeField] private float frequency = 1f;
+    
+    [Header("Audio")]
+    [SerializeField] private AudioClip collectSound;
 
     private Vector3 startPosition;
 
     private void Start()
     {
-        // Simpan posisi awal item saat game dimulai
         startPosition = transform.position;
     }
 
     private void Update()
     {
-        // Membuat efek melayang naik turun
-        // Rumus: Posisi Awal + (Sinus dari waktu * kecepatan) * tinggi
         float newY = startPosition.y + Mathf.Sin(Time.time * frequency) * amplitude;
         transform.position = new Vector3(startPosition.x, newY, startPosition.z);
     }
@@ -48,6 +48,11 @@ public class HealthCollectible : MonoBehaviour
                 {
                     playerHealth.AddHealth(healthValue);
                     Debug.Log("Beruntung! Darah bertambah.");
+                }
+
+                if (collectSound != null)
+                {
+                    AudioSource.PlayClipAtPoint(collectSound, transform.position);
                 }
 
                 gameObject.SetActive(false);

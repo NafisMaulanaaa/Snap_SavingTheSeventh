@@ -9,19 +9,20 @@ public class Dialogue_1 : MonoBehaviour
     public string[] lines;
     public float textSpeed;
     
-    [Header("Next Dialogue")]
-    public GameObject nextDialogBox; // Assign DialogBox di Inspector
+    [Header("Next Action")]
+    public GameObject nextDialogBox; // Untuk dialog berikutnya
+    public bool loadSceneAfterDialogue = false; // Centang ini kalau mau pindah scene
+    public string sceneToLoad; // Nama scene yang mau di-load
+    public float delayBeforeTransition = 0.5f; // Delay sebelum transisi
 
     private int index;
 
-    // Start is called before the first frame update
     void Start()
     {
         textComponent.text = string.Empty;
         StartDialogue();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (Input.GetMouseButtonDown(0))
@@ -63,16 +64,31 @@ public class Dialogue_1 : MonoBehaviour
         }
         else
         {
-            EndDialogue();
+            StartCoroutine(EndDialogue());
         }
     }
     
-    void EndDialogue()
+    IEnumerator EndDialogue()
     {
+        yield return new WaitForSeconds(delayBeforeTransition);
+        
         gameObject.SetActive(false);
         
-        // Aktifkan dialog box berikutnya
-        if (nextDialogBox != null)
+        // Kalau mau pindah scene
+        if (loadSceneAfterDialogue && !string.IsNullOrEmpty(sceneToLoad))
+        {
+            if (FadeManager.Instance != null)
+            {
+                FadeManager.Instance.LoadSceneWithFade(sceneToLoad);
+            }
+            else
+            {
+                Debug.LogWarning("FadeManager tidak ditemukan! Loading scene tanpa fade.");
+                UnityEngine.SceneManagement.SceneManager.LoadScene(sceneToLoad);
+            }
+        }
+        // Kalau mau lanjut ke dialog berikutnya
+        else if (nextDialogBox != null)
         {
             nextDialogBox.SetActive(true);
         }

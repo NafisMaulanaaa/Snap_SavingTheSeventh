@@ -8,7 +8,7 @@ public class Portal : MonoBehaviour
 
     [Header("UI Reference")]
     public CoinUI coinUI;
-    [SerializeField] private NotificationUI notificationUI; // TAMBAH INI
+    [SerializeField] private NotificationUI notificationUI;
 
     [Header("Scene Settings")]
     [SerializeField] private string namaSceneTujuan;
@@ -26,6 +26,9 @@ public class Portal : MonoBehaviour
     [SerializeField] private ParticleSystem unlockEffect;
     [SerializeField] private bool autoLoadScene = true;
     [SerializeField] private float delayBeforeLoad = 1.5f;
+    
+    [Header("Audio")]
+    [SerializeField] private AudioClip portalUnlockSound;
 
     private bool isUnlocked = false;
 
@@ -44,7 +47,6 @@ public class Portal : MonoBehaviour
 
     private void Start()
     {
-        // Sembunyikan sprite (transparan)
         if (portalSprite != null)
         {
             Color c = portalSprite.color;
@@ -86,10 +88,15 @@ public class Portal : MonoBehaviour
         isUnlocked = true;
         Debug.Log("✨ PORTAL TERBUKA!");
 
-        // TAMPILKAN NOTIFIKASI!
         if (notificationUI != null)
         {
             notificationUI.ShowNotification("Portal telah terbuka!");
+        }
+
+        // PLAY PORTAL UNLOCK SOUND
+        if (portalUnlockSound != null)
+        {
+            AudioSource.PlayClipAtPoint(portalUnlockSound, transform.position);
         }
 
         if (unlockEffect != null)
@@ -105,23 +112,18 @@ public class Portal : MonoBehaviour
             }
             else
             {
-                // Langsung muncul
                 Color c = portalSprite.color;
                 c.a = 1f;
                 portalSprite.color = c;
-                
             }
         }
         
         if (autoLoadScene)
         {
-            // Cari script King di scene
-            // (Ganti 'King' dengan nama script playermu kalau beda)
             King playerScript = FindFirstObjectByType<King>(); 
             
             if (playerScript != null)
             {
-                // Suruh dia jalan ke KANAN (1f). Kalau mau ke kiri ganti jadi (-1f)
                 playerScript.StartAutoWalk(1f); 
             }
             
@@ -134,7 +136,7 @@ public class Portal : MonoBehaviour
         if (portalSprite == null) yield break;
 
         Color originalColor = portalSprite.color;
-        float targetAlpha = 1f; // Selalu fade ke alpha 1
+        float targetAlpha = 1f;
 
         float elapsed = 0f;
         while (elapsed < fadeInDuration)
@@ -147,7 +149,6 @@ public class Portal : MonoBehaviour
             yield return null;
         }
 
-        // Pastikan full alpha
         Color finalColor = originalColor;
         finalColor.a = targetAlpha;
         portalSprite.color = finalColor;
