@@ -1023,9 +1023,6 @@ MonoBehaviour:
   - characterName: Raja Eldric
     characterSprite: {fileID: -8776110052657952425, guid: 394a40bacd79b014a94d747f8f332593, type: 3}
     line: 'Ayo pulang, permata kecilku... Ibu menunggumu... Kerajaan Eldoria menunggumu... '
-  - characterName: Raja Eldric
-    characterSprite: {fileID: -8776110052657952425, guid: 394a40bacd79b014a94d747f8f332593, type: 3}
-    line: 'Ayo pulang, permata kecilku... Ibu menunggumu... Kerajaan Eldoria menunggumu... '
   - characterName: Putri Elara
     characterSprite: {fileID: -5095649862938434300, guid: 5fac1a1853f32b446a7b23eaf163a763, type: 3}
     line: Aku ingin pulang, Ayah... Aku rindu Ibu... Aku rindu rumah.
