@@ -2709,7 +2709,7 @@ MonoBehaviour:
   textSpeed: 0.2
   nextDialogBox: {fileID: 0}
   loadSceneAfterDialogue: 1
-  sceneToLoad: Stage_1
+  sceneToLoad: Guide
   delayBeforeTransition: 0.5
   stopCutsceneAudio: 1
 --- !u!114 &2102063342
