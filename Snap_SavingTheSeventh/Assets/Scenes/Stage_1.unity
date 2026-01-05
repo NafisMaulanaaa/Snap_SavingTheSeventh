@@ -44497,7 +44497,7 @@ CompositeCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 4244e05e73a730c4aaf5f4bb60b70886, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -50969,7 +50969,7 @@ CapsuleCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 34e3c7c5e7bb71549842c55662c47d40, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -50993,8 +50993,8 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.016847137, y: 0.38742226}
-  m_Size: {x: 0.5336944, y: 0.73423207}
+  m_Offset: {x: -0.00433087, y: 0.38742226}
+  m_Size: {x: 0.50866187, y: 0.73423207}
   m_Direction: 0
 --- !u!50 &2108095172
 Rigidbody2D:
@@ -51019,9 +51019,9 @@ Rigidbody2D:
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_Interpolate: 1
+  m_SleepingMode: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!224 &2108095173
 RectTransform:
