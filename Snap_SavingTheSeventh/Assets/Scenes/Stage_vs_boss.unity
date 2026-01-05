@@ -1907,9 +1907,9 @@ MonoBehaviour:
     m_Bits: 128
   attackDamage: 0.5
   attackDuration: 0.2
-  attackSound: {fileID: 8300000, guid: 3a0fc2c36bdd3844789e0c34504e67ec, type: 3}
-  hitSound: {fileID: 8300000, guid: 54d500732d39f0b4d9cb7a015304d504, type: 3}
-  deathSound: {fileID: 8300000, guid: 00bcb84c01010d547b8666fe83491836, type: 3}
+  attackSound: {fileID: 8300000, guid: 66d2faee337710045913ef181b5ee8d8, type: 3}
+  hitSound: {fileID: 8300000, guid: 70eb42905125bba409dc54922b931620, type: 3}
+  deathSound: {fileID: 8300000, guid: 70eb42905125bba409dc54922b931620, type: 3}
   respawnPoint: {x: 0, y: 0}
   fallLimitY: -15
   minX: -10
@@ -8596,14 +8596,14 @@ MonoBehaviour:
   monsterColliderOffset: {x: -0.00262481, y: 0.3609599}
   humanScale: 2
   monsterScale: 4
-  humanMaxHealth: 25
-  monsterMaxHealth: 30
-  movementDistance: 4
+  humanMaxHealth: 20
+  monsterMaxHealth: 40
+  movementDistance: 6
   speed: 2
   damage: 0.5
   chaseDistance: 5
   chaseSpeed: 4
-  attackCooldown: 3
+  attackCooldown: 4
   attackRange: 1
   transformHealthPercent: 0.1
   transformEffect: {fileID: 0}

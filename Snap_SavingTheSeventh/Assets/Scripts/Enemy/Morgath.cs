@@ -98,6 +98,12 @@ public class Morgath : MonoBehaviour
     [SerializeField] private float deathDelay = 2.0f;
     private bool isDead = false;
 
+    // Tambahkan variabel ini di bagian private atas
+    private bool isInvulnerable = false; 
+
+    // Tambahkan fungsi publik untuk mengecek status kebal
+    public bool IsInvulnerable() { return isInvulnerable; }
+
     private void Awake()
     {
         leftEdge = transform.position.x - movementDistance;
@@ -192,6 +198,7 @@ public class Morgath : MonoBehaviour
     private IEnumerator HandleBossDeath()
     {
         isDead = true; // Kunci agar tidak terpanggil berulang kali
+        isInvulnerable = true;
         
         Debug.Log("Morgath Mati. Memulai proses delay...");
 
@@ -204,10 +211,7 @@ public class Morgath : MonoBehaviour
 
         // 2. Samakan Trigger Animasi dengan Health.cs
         // Kamu pakai "4_Death" di script Health, jadi pakai itu juga di sini
-        if (anim != null) 
-        {
-            anim.SetTrigger("4_Death"); 
-        }
+        if (anim != null) anim.SetTrigger("4_Death");
 
         // 3. Matikan Collider (Opsional tapi disarankan)
         // Agar Player bisa lewat/tidak menabrak mayat Boss selama delay
@@ -217,15 +221,22 @@ public class Morgath : MonoBehaviour
         // 4. Tunggu selama delay (Misal 2 detik)
         yield return new WaitForSeconds(deathDelay);
 
+        if (monsterModel != null) monsterModel.SetActive(false);
+
         // 5. Pindah ke scene selanjutnya
         if (!string.IsNullOrEmpty(nextSceneName))
-        {
-            SceneManager.LoadScene(nextSceneName);
+    {
+        if (FadeManager.Instance != null)
+            {
+                FadeManager.Instance.LoadSceneWithFade(nextSceneName);
+            }
+            else
+            {
+                SceneManager.LoadScene(nextSceneName);
+            }
         }
-        else
-        {
-            Debug.LogError("[MORGATH] ERROR: Nama Scene tujuan kosong di Inspector!");
-        }
+
+        Destroy(gameObject, 1f);
     }
 
     private void PlayRandomVoice()
@@ -276,6 +287,7 @@ public class Morgath : MonoBehaviour
     {
         hasTransformed = true;
         isCasting = true;
+        isInvulnerable = true;
         
         rb.linearVelocity = Vector2.zero;
         if (anim != null) anim.SetBool("1_Move", false);
@@ -381,6 +393,7 @@ public class Morgath : MonoBehaviour
             whiteFlashUI.alpha = 0f;
         }
 
+        isInvulnerable = false;
         isCasting = false;
         Debug.Log("[MORGATH] PHASE 2 START!");
     }

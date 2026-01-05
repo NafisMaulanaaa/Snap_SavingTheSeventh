@@ -22,6 +22,13 @@ public class Health : MonoBehaviour
     {
         if (dead) return;
 
+        Morgath boss = GetComponent<Morgath>();
+        if (boss != null && boss.IsInvulnerable()) 
+        {
+            Debug.Log("Boss sedang kebal!");
+            return; // Keluar dari fungsi, damage tidak masuk
+        }
+
         currentHealth = Mathf.Clamp(currentHealth - _damage, 0, startingHealth);
 
         if (currentHealth > 0)

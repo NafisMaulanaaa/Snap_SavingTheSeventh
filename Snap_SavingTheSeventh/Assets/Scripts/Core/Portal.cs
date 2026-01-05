@@ -53,17 +53,11 @@ public class Portal : MonoBehaviour
             c.a = 0f;
             portalSprite.color = c;
         }
-        else
-        {
-            Debug.LogWarning("Portal Sprite belum di-assign!");
-        }
 
         if (coinUI != null)
         {
             coinUI.UpdateScoreText(currentCoins, coinsNeeded);
         }
-
-        Debug.Log($"Portal butuh {coinsNeeded} koin.");
     }
 
     public void AddCoin()
@@ -74,8 +68,6 @@ public class Portal : MonoBehaviour
         {
             coinUI.UpdateScoreText(currentCoins, coinsNeeded);
         }
-
-        Debug.Log($"Koin: {currentCoins}/{coinsNeeded}");
 
         if (currentCoins >= coinsNeeded && !isUnlocked)
         {
@@ -93,7 +85,6 @@ public class Portal : MonoBehaviour
             notificationUI.ShowNotification("Portal telah terbuka!");
         }
 
-        // PLAY PORTAL UNLOCK SOUND
         if (portalUnlockSound != null)
         {
             AudioSource.PlayClipAtPoint(portalUnlockSound, transform.position);
@@ -108,7 +99,7 @@ public class Portal : MonoBehaviour
         {
             if (useFadeEffect)
             {
-                StartCoroutine(FadeInPortal());
+                StartCoroutine(FadeInPortalVisual());
             }
             else
             {
@@ -121,60 +112,59 @@ public class Portal : MonoBehaviour
         if (autoLoadScene)
         {
             King playerScript = FindFirstObjectByType<King>(); 
-            
             if (playerScript != null)
             {
                 playerScript.StartAutoWalk(1f); 
             }
             
+            // Beri jeda sedikit agar efek portal muncul dulu baru layar menghitam
             Invoke(nameof(LoadNextScene), delayBeforeLoad);
         }
     }
 
-    private IEnumerator FadeInPortal()
+    // Coroutine untuk memunculkan sprite portal (Alpha 0 ke 1)
+    private IEnumerator FadeInPortalVisual()
     {
         if (portalSprite == null) yield break;
-
-        Color originalColor = portalSprite.color;
-        float targetAlpha = 1f;
 
         float elapsed = 0f;
         while (elapsed < fadeInDuration)
         {
             elapsed += Time.deltaTime;
-            float alpha = Mathf.Lerp(0f, targetAlpha, elapsed / fadeInDuration);
-            Color newColor = originalColor;
-            newColor.a = alpha;
-            portalSprite.color = newColor;
+            float alpha = Mathf.Lerp(0f, 1f, elapsed / fadeInDuration);
+            portalSprite.color = new Color(portalSprite.color.r, portalSprite.color.g, portalSprite.color.b, alpha);
             yield return null;
-        }
-
-        Color finalColor = originalColor;
-        finalColor.a = targetAlpha;
-        portalSprite.color = finalColor;
-
-        if (autoLoadScene)
-        {
-            yield return new WaitForSeconds(delayBeforeLoad);
-            LoadNextScene();
         }
     }
 
+    // Fungsi utama untuk pindah scene dengan FadeManager
     private void LoadNextScene()
     {
         if (!string.IsNullOrEmpty(namaSceneTujuan))
         {
-            Debug.Log($"Loading: {namaSceneTujuan}");
-            SceneManager.LoadScene(namaSceneTujuan);
+            Debug.Log($"Memanggil FadeManager untuk ke: {namaSceneTujuan}");
+            
+            // Cek apakah FadeManager ada di scene
+            if (FadeManager.Instance != null)
+            {
+                FadeManager.Instance.LoadSceneWithFade(namaSceneTujuan);
+            }
+            else
+            {
+                // Jika FadeManager tidak ditemukan, pindah scene biasa agar tidak error
+                SceneManager.LoadScene(namaSceneTujuan);
+                Debug.LogWarning("FadeManager tidak ditemukan! Pindah scene tanpa efek.");
+            }
         }
         else
         {
-            Debug.LogError("Nama scene kosong!");
+            Debug.LogError("Nama scene tujuan belum diisi di Inspector Portal!");
         }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        // Jika tidak autoLoad, pemain harus menyentuh portal yang sudah terbuka
         if (collision.CompareTag("Player") && isUnlocked && !autoLoadScene)
         {
             LoadNextScene();
