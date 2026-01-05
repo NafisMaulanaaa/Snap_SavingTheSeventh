@@ -1841,11 +1841,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   textComponent: {fileID: 78379744}
   lines:
-  - Setelah pertarungan yang perjalanan panjang dan pertarungan dahsyat akhirnya
-    Morgath telah musnah dari permukaan bumi. Dengan badan yang penuh luka, Raja
-    berlari ke markas dimana Morgath menyandera putrinya. Ia bergegas masuk ke markasnya
-    hingga akhirnya dia menemukan putrinya, Elara. Dan sang putri pun melihat ayahnya
-    bergegas segera menjemputnya.
+  - Setelah perjalanan panjang dan pertarungan dahsyat akhirnya Morgath telah musnah
+    dari muka bumi. Dengan badan yang penuh luka, Raja berlari ke markas dimana Morgath
+    menyandera putrinya. Ia bergegas masuk ke markasnya hingga akhirnya dia menemukan
+    putrinya, Elara. Dan sang putri pun melihat ayahnya bergegas segera menjemputnya.
   textSpeed: 0.1
   nextDialogBox: {fileID: 1045929773}
   loadSceneAfterDialogue: 0
