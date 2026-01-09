@@ -2190,7 +2190,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
+  m_VertexColorAlwaysGammaSpace: 1
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -49479,7 +49479,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   coinUI: {fileID: 454409651}
-  notificationUI: {fileID: 0}
+  notificationUI: {fileID: 699777443}
   namaSceneTujuan: Stage_3
   coinsNeeded: 6
   currentCoins: 0
