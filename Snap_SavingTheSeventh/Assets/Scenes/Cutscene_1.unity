@@ -39322,7 +39322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   musicSource: {fileID: 1766850281}
   cutsceneMusic: {fileID: 8300000, guid: c3e78724e9483dd468e7775dbb0c7fc1, type: 3}
-  musicVolume: 0.5
+  musicVolume: 1
 --- !u!4 &1766850283
 Transform:
   m_ObjectHideFlags: 0
